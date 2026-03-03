@@ -1,0 +1,758 @@
+{
+  "name": "tube-harvester",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8be17904-0007-4a27-8bd3-aeeb09a05215",
+              "name": "nextPageToken",
+              "value": "={{ $('HTTP Request2').item.json.nextPageToken }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        736
+      ],
+      "id": "7198248f-0381-4cc9-92bb-58b0cf85469d",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8d1a9cd7-2411-4475-8da8-841765602a60",
+              "name": "nextPageToken",
+              "value": "={{ $('HTTP Request3').item.json.nextPageToken }}",
+              "type": "string"
+            },
+            {
+              "id": "f9119d1c-4b48-45b4-aa76-b26727aac1e0",
+              "name": "prevPageToken",
+              "value": "={{ $('HTTP Request3').item.json.prevPageToken }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        848,
+        240
+      ],
+      "id": "4b8ae5bd-36d0-4085-a74b-898616f99ce5",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        32
+      ],
+      "id": "b7a938fd-8f04-4eb5-8ca2-75212e520cf5",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7e1ee063-9e4c-4106-be38-086e1ce3be52",
+              "name": "nextPageToken",
+              "value": "={{ $json.data[0].nextPageToken }}",
+              "type": "string"
+            },
+            {
+              "id": "bc0b5be1-6979-45c0-8ee2-f724bc21f428",
+              "name": "prevPageToken",
+              "value": "={{ $json.data[0].prevPageToken }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        256
+      ],
+      "id": "ae52f16b-692d-4114-9180-984edde4173f",
+      "name": "Page Token1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        608,
+        256
+      ],
+      "id": "091dd8ae-4f42-4952-95e0-0e2ed0c73c46",
+      "name": "Split Out3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f08594af-5bcd-45ac-8728-9ea10c998d03",
+              "leftValue": "={{$runIndex}}",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            },
+            {
+              "id": "40a8dfe4-d120-4558-8ad3-a5334ddb2092",
+              "leftValue": "={{ $('Page Token1').isExecuted ? !!$('Page Token1').item.json.nextPageToken : true }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        32
+      ],
+      "id": "1c95b601-8edb-46f1-8122-10348a1f54f0",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/playlistItems",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet,contentDetails,status"
+            },
+            {
+              "name": "playlistId",
+              "value": "YOUR_PLAYLIST_ID"
+            },
+            {
+              "name": "maxResults",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        16
+      ],
+      "id": "38c9f020-d6f3-445f-bf25-45d82416e7b5",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0 0 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        32
+      ],
+      "id": "eeb92e9e-30ff-41de-af8b-9bc8b83a4ac9",
+      "name": "Schedule Trigger5"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        528,
+        944
+      ],
+      "id": "c4598f56-6b0b-4574-a6ce-be158305ea8e",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86562db8-0e24-4e68-be97-04aaa3c4ef32",
+              "name": "nextPageToken",
+              "value": "={{ $json.data[0].nextPageToken }}",
+              "type": "string"
+            },
+            {
+              "id": "3695e9cf-dd69-43e3-9466-77d27c882c22",
+              "name": "prevPageToken",
+              "value": "={{ $json.data[0].prevPageToken }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        672
+      ],
+      "id": "8fd23c9b-dad7-4ef9-a732-c55899b82790",
+      "name": "Page Token"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        512,
+        736
+      ],
+      "id": "4932bdce-7bb2-4067-852a-e6aa3d1cc1c9",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "youtube_videos",
+          "mode": "list",
+          "cachedResultName": "youtube_videos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.items.id }}",
+            "title": "={{ $json.items.snippet.title }}",
+            "description": "={{ $('HTTP Request3').item.json.items[0].snippet.description }}",
+            "published_at": "={{ $json.items.snippet.publishedAt }}",
+            "thumbnail": "={{ $('HTTP Request3').item.json.items[0].snippet.thumbnails }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "published_at",
+              "displayName": "published_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "thumbnail",
+              "displayName": "thumbnail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        832,
+        736
+      ],
+      "id": "20340778-113d-422d-a41a-d7308efabb88",
+      "name": "Insert or update rows in a table5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f08594af-5bcd-45ac-8728-9ea10c998d03",
+              "leftValue": "={{$runIndex}}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            },
+            {
+              "id": "cdff2a3b-65c5-43be-8af4-7e2e9becbe53",
+              "leftValue": "={{ $('Page Token').isExecuted ? !!$('Page Token').item.json.nextPageToken : true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        512
+      ],
+      "id": "a564ec92-f746-4a49-b90c-6e63b5e371b7",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/playlists",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "part",
+              "value": "snippet, status"
+            },
+            {
+              "name": "channelId",
+              "value": "YOUR_CHANNEL_ID"
+            },
+            {
+              "name": "maxResults",
+              "value": "50"
+            },
+            {
+              "name": "pageToken",
+              "value": "={{ $('Page Token').isExecuted ? $('Page Token').item.json.nextPageToken : \"\" }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        512,
+        496
+      ],
+      "id": "27d8bd26-8345-462e-be15-9da42b987a58",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "youtube_videos",
+          "mode": "list",
+          "cachedResultName": "youtube_videos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.items.contentDetails.videoId }}",
+            "title": "={{ $json.items.snippet.title }}",
+            "description": "={{ $('HTTP Request3').item.json.items[0].snippet.description }}",
+            "published_at": "={{ $json.items.contentDetails.videoPublishedAt }}",
+            "thumbnail": "={{ $('HTTP Request3').item.json.items[0].snippet.thumbnails }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "published_at",
+              "displayName": "published_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "thumbnail",
+              "displayName": "thumbnail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        800,
+        16
+      ],
+      "id": "96f00b5d-247a-4f4c-8a1f-49f799f6b97c",
+      "name": "Insert or update rows in a table"
+    },
+    {
+      "parameters": {
+        "content": "**📋 YouTube → PostgreSQL Sync**\n\nRuns daily at midnight. Fetches videos and playlists from a YouTube channel via the YouTube Data API (paginated) and upserts them into the youtube_videos PostgreSQL table. Duplicates are handled automatically via upsert on id.",
+        "height": 128,
+        "width": 752
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        256,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "4d3830a0-19e5-40d0-9058-eaa3e32b0661",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 1264,
+        "width": 1376,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -48,
+        -32
+      ],
+      "typeVersion": 1,
+      "id": "b376bc5e-53ba-45bd-89f2-bb886ced28f4",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Page Token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Page Token1": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger5": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Page Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Page Token": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert or update rows in a table5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "4f3c1508-51a9-4cae-a860-faafc879eabc",
+  "meta": {
+    "instanceId": "791d9650e1108b70eac24b6a3c5b4d2966cf4571e58666e0cebfc3b294cd4e9d"
+  },
+  "id": "xNNb5gkQLSy1QY56",
+  "tags": []
+}
