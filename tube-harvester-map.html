@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tube-harvester — Workflow Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e2e;
+    --red: #ff3b3b;
+    --orange: #ff6b2b;
+    --yellow: #ffd166;
+    --green: #06d6a0;
+    --blue: #4cc9f0;
+    --purple: #7b5ea7;
+    --text: #e8e8f0;
+    --muted: #5a5a7a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(76,201,240,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(76,201,240,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 30px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 70px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  header .tag {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--yellow), var(--orange), var(--red));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+
+  /* FLOW */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  /* SECTION ROWS */
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .row:nth-child(1) { animation-delay: 0.1s; }
+  .row:nth-child(2) { animation-delay: 0.2s; }
+  .row:nth-child(3) { animation-delay: 0.3s; }
+  .row:nth-child(4) { animation-delay: 0.4s; }
+  .row:nth-child(5) { animation-delay: 0.5s; }
+  .row:nth-child(6) { animation-delay: 0.6s; }
+
+  /* NODE */
+  .node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    min-width: 160px;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+
+  .node:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+
+  .node .icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .node .label {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .node .sublabel {
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* Node color variants */
+  .node.trigger { border-color: var(--green); box-shadow: 0 0 20px rgba(6,214,160,0.1); }
+  .node.trigger .icon { color: var(--green); }
+
+  .node.condition { border-color: var(--yellow); box-shadow: 0 0 20px rgba(255,209,102,0.1); }
+  .node.condition .icon { color: var(--yellow); }
+
+  .node.api { border-color: var(--blue); box-shadow: 0 0 20px rgba(76,201,240,0.1); }
+  .node.api .icon { color: var(--blue); }
+
+  .node.transform { border-color: var(--purple); box-shadow: 0 0 20px rgba(123,94,167,0.1); }
+  .node.transform .icon { color: var(--purple); }
+
+  .node.db { border-color: var(--orange); box-shadow: 0 0 20px rgba(255,107,43,0.1); }
+  .node.db .icon { color: var(--orange); }
+
+  /* ARROW */
+  .arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    color: var(--muted);
+    font-size: 18px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .arrow::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), var(--muted));
+  }
+
+  .arrow::after {
+    content: '▶';
+    font-size: 8px;
+    color: var(--muted);
+    margin-left: -4px;
+  }
+
+  .arrow.down {
+    flex-direction: column;
+    padding: 8px 0;
+    height: 50px;
+    justify-content: center;
+    margin-left: 60px;
+  }
+
+  .arrow.down::before {
+    width: 1px;
+    height: 30px;
+    background: linear-gradient(180deg, var(--border), var(--muted));
+  }
+
+  .arrow.down::after {
+    content: '▼';
+    margin-left: 0;
+    margin-top: -4px;
+  }
+
+  /* BRANCH SECTION */
+  .branch-container {
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .branch {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    background: rgba(255,255,255,0.01);
+    position: relative;
+    flex: 1;
+  }
+
+  .branch-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .branch.loop1 { border-color: rgba(76,201,240,0.3); }
+  .branch.loop1 .branch-label { color: var(--blue); }
+
+  .branch.loop2 { border-color: rgba(255,107,43,0.3); margin-top: 30px; }
+  .branch.loop2 .branch-label { color: var(--orange); }
+
+  .branch-divider {
+    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 80px;
+    flex-shrink: 0;
+  }
+
+  .branch-divider .or {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    writing-mode: vertical-rl;
+    text-transform: uppercase;
+  }
+
+  .branch-divider::before, .branch-divider::after {
+    content: '';
+    width: 1px;
+    height: 60px;
+    background: var(--border);
+  }
+
+  /* Loop indicator */
+  .loop-badge {
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* INLINE FLOW within branch */
+  .branch-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .branch-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 0;
+  }
+
+  /* DB section */
+  .db-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    animation: fadeUp 0.6s ease 0.7s both;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.6s ease 0.8s both;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Pulse on trigger */
+  .node.trigger::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 16px;
+    border: 1px solid var(--green);
+    opacity: 0;
+    animation: pulse 2.5s ease infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0; transform: scale(1); }
+    50% { opacity: 0.3; }
+    100% { opacity: 0; transform: scale(1.05); }
+  }
+
+  /* Data flow line */
+  .data-line {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--blue), transparent);
+    background-size: 200% 100%;
+    animation: dataFlow 2s linear infinite;
+    flex: 1;
+    min-width: 30px;
+  }
+
+  @keyframes dataFlow {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .connector {
+    display: flex;
+    align-items: center;
+    width: 40px;
+    height: 2px;
+    background: var(--border);
+    flex-shrink: 0;
+    margin: 0 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .connector::after {
+    content: '';
+    position: absolute;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(76,201,240,0.6));
+    animation: flow 1.5s linear infinite;
+  }
+
+  @keyframes flow {
+    to { left: 200%; }
+  }
+
+  .arrow-head {
+    color: var(--muted);
+    font-size: 8px;
+    margin-left: -4px;
+  }
+
+  .vert-connector {
+    width: 1px;
+    height: 36px;
+    background: var(--border);
+    margin-left: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vert-connector::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(180deg, transparent, rgba(76,201,240,0.6));
+    animation: flowDown 1.5s linear infinite;
+  }
+
+  @keyframes flowDown {
+    to { top: 200%; }
+  }
+
+  .vert-head {
+    margin-left: 54px;
+    color: var(--muted);
+    font-size: 10px;
+  }
+
+  /* Loop arrow back */
+  .loop-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 8px 10px;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .loop-back::before {
+    content: '↺';
+    font-size: 16px;
+    color: var(--yellow);
+  }
+
+  .if-badge {
+    display: inline-block;
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 1px;
+  }
+
+  .if-true { background: rgba(6,214,160,0.15); color: var(--green); }
+  .if-false { background: rgba(255,61,61,0.15); color: var(--red); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="tag">n8n workflow</div>
+    <h1>tube-harvester</h1>
+    <p>YouTube Data API → PostgreSQL · nightly sync</p>
+  </header>
+
+  <div class="flow">
+
+    <!-- TRIGGER -->
+    <div class="row">
+      <div class="node trigger">
+        <span class="icon">⏰</span>
+        <div class="label">Schedule Trigger</div>
+        <div class="sublabel">Every day at midnight<br><code>0 0 0 * * *</code></div>
+      </div>
+      <div class="connector"></div><span class="arrow-head">▶</span>
+
+      <div style="width:20px"></div>
+
+      <div class="node condition">
+        <span class="icon">⚡</span>
+        <div class="label">If5</div>
+        <div class="sublabel">
+          runIndex &lt; 20 <br>
+          nextPageToken exists
+        </div>
+      </div>
+    </div>
+
+    <div class="vert-connector"></div>
+    <div class="vert-head">▼</div>
+
+    <!-- BRANCH -->
+    <div class="branch-container">
+
+      <!-- LOOP 1 -->
+      <div class="branch loop1">
+        <div class="loop-badge">loop 1 · max 20 pages</div>
+        <div class="branch-label">📹 Playlist Items (Videos)</div>
+
+        <div class="branch-flow">
+          <div class="branch-row">
+            <div class="node api">
+              <span class="icon">▶️</span>
+              <div class="label">HTTP Request3</div>
+              <div class="sublabel">GET playlistItems<br>10 results / page</div>
+            </div>
+            <div class="connector"></div><span class="arrow-head">▶</span>
+
+            <div class="node transform">
+              <span class="icon">✂️</span>
+              <div class="label">Split Out3</div>
+              <div class="sublabel">Explode items[]<br>into single rows</div>
+            </div>
+            <div class="connector"></div><span class="arrow-head">▶</span>
+
+            <div class="node db">
+              <span class="icon">🗄️</span>
+              <div class="label">Upsert</div>
+              <div class="sublabel">youtube_videos<br>match on id</div>
+            </div>
+          </div>
+
+          <div style="height:14px"></div>
+
+          <div class="branch-row" style="margin-left: 20px;">
+            <div class="node transform" style="min-width:120px">
+              <span class="icon">✏️</span>
+              <div class="label">Edit Fields1</div>
+              <div class="sublabel">Extract tokens</div>
+            </div>
+            <div class="connector"></div><span class="arrow-head">▶</span>
+            <div class="node transform" style="min-width:110px">
+              <span class="icon">📦</span>
+              <div class="label">Aggregate3</div>
+              <div class="sublabel">Merge items</div>
+            </div>
+            <div class="connector"></div><span class="arrow-head">▶</span>
+            <div class="node transform" style="min-width:120px">
+              <span class="icon">🔖</span>
+              <div class="label">Page Token1</div>
+              <div class="sublabel">nextPageToken</div>
+            </div>
+          </div>
+
+          <div class="loop-back">loops back to If5 with nextPageToken <span class="if-badge if-true">TRUE</span></div>
+        </div>
+      </div>
+
+      <div class="branch-divider">
+        <span class="or">false</span>
+      </div>
+
+      <!-- LOOP 2 -->
+      <div class="branch loop2">
+        <div class="loop-badge">loop 2 · max 10 pages</div>
+        <div class="branch-label">📋 Channel Playlists</div>
+
+        <div class="branch-flow">
+          <div class="branch-row">
+            <div class="node condition" style="min-width:120px">
+              <span class="icon">⚡</span>
+              <div class="label">If4</div>
+              <div class="sublabel">runIndex &lt; 10<br>nextPageToken</div>
+            </div>
+            <div class="connector"></div><span class="arrow-head">▶</span>
+            <div class="node api">
+              <span class="icon">📋</span>
+              <div class="label">HTTP Request2</div>
+              <div class="sublabel">GET playlists<br>50 results / page</div>
+            </div>
+            <div class="connector"></div><span class="arrow-head">▶</span>
+            <div class="node db">
+              <span class="icon">🗄️</span>
+              <div class="label">Upsert</div>
+              <div class="sublabel">youtube_videos<br>match on id</div>
+            </div>
+          </div>
+
+          <div style="height:14px"></div>
+
+          <div class="branch-row" style="margin-left: 10px;">
+            <div class="node transform" style="min-width:110px">
+              <span class="icon">✏️</span>
+              <div class="label">Edit Fields2</div>
+              <div class="sublabel">Extract tokens</div>
+            </div>
+            <div class="connector"></div><span class="arrow-head">▶</span>
+            <div class="node transform" style="min-width:110px">
+              <span class="icon">📦</span>
+              <div class="label">Aggregate2</div>
+              <div class="sublabel">Merge items</div>
+            </div>
+            <div class="connector"></div><span class="arrow-head">▶</span>
+            <div class="node transform" style="min-width:110px">
+              <span class="icon">🔖</span>
+              <div class="label">Page Token</div>
+              <div class="sublabel">nextPageToken</div>
+            </div>
+          </div>
+
+          <div class="loop-back">loops back to If4 with nextPageToken <span class="if-badge if-true">TRUE</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DB OUTPUT -->
+    <div style="height:40px; display:flex; align-items:center; padding-left:30px; gap:8px; opacity:0.5; animation: fadeUp 0.6s ease 0.8s both;">
+      <div style="width:1px; height:40px; background: linear-gradient(180deg, var(--border), var(--orange));"></div>
+    </div>
+
+    <div class="db-section" style="padding-left:10px;">
+      <div class="node db" style="min-width:320px; animation: fadeUp 0.6s ease 0.9s both;">
+        <span class="icon">🐘</span>
+        <div class="label">PostgreSQL — youtube_videos</div>
+        <div class="sublabel" style="margin-top:8px; display:flex; gap:16px; flex-wrap:wrap;">
+          <span>id · PK</span>
+          <span>title</span>
+          <span>description</span>
+          <span>published_at</span>
+          <span>thumbnail</span>
+          <span>created_at</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Trigger</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div> Condition / If</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> HTTP / API call</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> Transform / Split</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div> Database</div>
+  </div>
+
+</div>
+</body>
+</html>
