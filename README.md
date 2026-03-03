@@ -1,4 +1,8 @@
-🎬 tube-harvester
+
+**tube-harvester**
+
+
+
 An n8n workflow that automatically syncs YouTube channel data into a PostgreSQL database every night at midnight.
 What it does
 Fetches all videos and playlists from a YouTube channel via the YouTube Data API and upserts them into a PostgreSQL table (youtube_videos). Pagination is handled automatically — no duplicates, no manual intervention.
